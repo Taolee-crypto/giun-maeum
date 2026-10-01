@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>기운과 마음 — 사주×MBTI</title>
+  <title>기운과 마음 — 사주×MBTI×타로</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -48,7 +48,6 @@
     .hidden {display:none !important;}
     ul {margin:0.5rem 0 1rem 1.5rem;}
     li {margin-bottom:0.4rem;}
-    small {font-weight:400; color:var(--muted); font-size:0.85rem;}
     .grid {display:grid; grid-template-columns:1fr 1fr; gap:0.8rem;}
     .pillar-grid {display:grid; grid-template-columns:repeat(4,1fr); gap:0.5rem; text-align:center; margin:1rem 0;}
     .pillar {background:#f8f7f5; border-radius:12px; padding:0.7rem 0.3rem;}
@@ -69,7 +68,7 @@
 
 <section id="splash" class="screen active">
   <h1 style="margin-top:5rem;">🌿 기운과 마음</h1>
-  <p class="subtitle">사주와 MBTI가 만나는 곳</p>
+  <p class="subtitle">사주 · MBTI · 타로가 만나는 곳</p>
   <button class="btn btn-primary" onclick="go('input')" style="margin-top:3rem;">시작하기</button>
   <p style="text-align:center; margin-top:3rem; font-size:0.85rem; color:#999; line-height:1.8;">
     어떤 정보도 서버에 저장되지 않습니다<br>
@@ -112,6 +111,7 @@
     <p id="dayMaster" style="font-weight:600; margin:0.5rem 0;"></p>
     <div class="elem-bar" id="elemBar"></div>
     <div class="elem-legend" id="elemLegend"></div>
+    <div id="dayMasterDetail" style="margin-top:1rem; padding-top:1rem; border-top:1px solid #eee;"></div>
     <p class="note" id="sajuNote"></p>
   </div>
 
@@ -137,6 +137,9 @@
     <p id="rDailyDo" style="margin-bottom:0.5rem;"></p>
     <p id="rDailyAvoid" style="color:var(--fire-txt);"></p>
   </div>
+
+  <h2>🃏 타로 메시지</h2>
+  <div class="card" id="tarotBox"></div>
 
   <h2>🎓 학생 진로 상담</h2>
   <div class="card" id="studentCareer">
