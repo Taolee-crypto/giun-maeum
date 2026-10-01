@@ -2,8 +2,17 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>기운과 마음 — 사주×MBTI×타로</title>
+  <meta name="theme-color" content="#5C6BC0">
+  <meta name="description" content="사주, MBTI, 타로가 만나는 개인 상담 앱">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="기운과마음">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -19,8 +28,8 @@
       --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     * {box-sizing:border-box; margin:0; padding:0; font-family:"Noto Sans KR", sans-serif; -webkit-tap-highlight-color:transparent;}
-    body {background:var(--bg); color:var(--text); line-height:1.7; min-height:100vh;}
-    .screen {display:none; min-height:100vh; padding:1.5rem; max-width:520px; margin:0 auto; animation:fadeIn 0.4s ease-out;}
+    body {background:var(--bg); color:var(--text); line-height:1.7; min-height:100vh; min-height:100dvh;}
+    .screen {display:none; min-height:100vh; min-height:100dvh; padding:1.5rem; padding-bottom:calc(1.5rem + env(safe-area-inset-bottom)); max-width:520px; margin:0 auto; animation:fadeIn 0.4s ease-out;}
     .screen.active {display:block;}
     @keyframes fadeIn {from{opacity:0; transform:translateY(12px);} to{opacity:1; transform:translateY(0);}}
     h1 {font-size:1.8rem; font-weight:700; margin-bottom:0.3rem; text-align:center;}
@@ -62,9 +71,20 @@
     .note {font-size:0.8rem; color:var(--muted); margin-top:0.5rem; line-height:1.5;}
     .career-box {background:#f9f8f6; border-radius:12px; padding:1rem; margin:0.6rem 0;}
     .career-box h4 {margin-bottom:0.4rem; font-size:0.95rem;}
+    .install-banner {display:none; position:fixed; bottom:0; left:0; right:0; background:#5C6BC0; color:white; padding:1rem 1.2rem; padding-bottom:calc(1rem + env(safe-area-inset-bottom)); z-index:100; box-shadow:0 -4px 20px rgba(0,0,0,0.15);}
+    .install-banner.show {display:flex; align-items:center; justify-content:space-between; gap:1rem; max-width:520px; margin:0 auto;}
+    .install-banner p {font-size:0.9rem; flex:1;}
+    .install-banner button {background:white; color:#5C6BC0; border:none; padding:0.6rem 1rem; border-radius:10px; font-weight:600; font-family:inherit; cursor:pointer; white-space:nowrap;}
+    .install-banner .close {background:transparent; color:white; font-size:1.2rem; padding:0.4rem;}
   </style>
 </head>
 <body>
+
+<div class="install-banner" id="installBanner">
+  <p>📱 홈 화면에 추가하면 앱처럼 사용할 수 있어요</p>
+  <button onclick="installApp()">설치</button>
+  <button class="close" onclick="dismissInstall()" aria-label="닫기">✕</button>
+</div>
 
 <section id="splash" class="screen active">
   <h1 style="margin-top:5rem;">🌿 기운과 마음</h1>
@@ -163,5 +183,33 @@
 <script src="app-a.js"></script>
 <script src="app-b.js"></script>
 <script src="app-c.js"></script>
+<script>
+// PWA install + service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (!localStorage.getItem('installDismissed')) {
+    document.getElementById('installBanner').classList.add('show');
+  }
+});
+function installApp() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(() => {
+    deferredPrompt = null;
+    document.getElementById('installBanner').classList.remove('show');
+  });
+}
+function dismissInstall() {
+  document.getElementById('installBanner').classList.remove('show');
+  localStorage.setItem('installDismissed', '1');
+}
+</script>
 </body>
 </html>
