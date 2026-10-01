@@ -1,4 +1,4 @@
-const CACHE = 'giun-maeum-v1';
+const CACHE = 'giun-maeum-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -6,8 +6,8 @@ const ASSETS = [
   './app-b.js',
   './app-c.js',
   './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
+  './icon-192.svg',
+  './icon-512.svg'
 ];
 
 self.addEventListener('install', e => {
