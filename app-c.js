@@ -19,6 +19,78 @@ function renderQ(){const q=questions[qIdx];document.getElementById('qTitle').tex
 function ans(n){answers[qIdx]=n;if(qIdx<questions.length-1){qIdx++;renderQ();}else showResult();}
 function prevQ(){if(qIdx>0){qIdx--;renderQ();}}
 
+function openTarotSelect() {
+  const box = document.getElementById('tarotBox');
+  const selected = currentTarot || [];
+  const selectedNs = new Set(selected.map(c => c.n));
+  const positions = ['현재의 에너지', '주의할 점', '앞으로의 흐름'];
+  const step = selected.length;
+
+  if (step >= 3) {
+    renderSelectedTarot();
+    return;
+  }
+
+  box.innerHTML = `
+    <p style="font-weight:600; margin-bottom:0.6rem;">🃏 ${positions[step]} 카드를 골라 주세요 (${step+1}/3)</p>
+    <p class="note" style="margin-bottom:0.8rem;">직감이 가는 카드를 터치하세요. 이미 고른 카드는 흐리게 표시됩니다.</p>
+    <div class="tarot-grid" id="tarotGrid">
+      ${TAROT.map(c => {
+        const used = selectedNs.has(c.n);
+        return `<button type="button" class="tarot-card-btn ${used ? 'used' : ''}"
+          ${used ? 'disabled' : ''} onclick="pickTarot(${c.n})">
+          <span class="tc-num">${c.n}</span>
+          <span class="tc-name">${c.name}</span>
+        </button>`;
+      }).join('')}
+    </div>
+    <div style="display:flex; gap:0.5rem; margin-top:1rem; flex-wrap:wrap;">
+      <button class="btn btn-option" style="flex:1; min-width:120px;" onclick="autoDrawTarot()">🎲 랜덤 3장</button>
+      ${step > 0 ? `<button class="btn btn-option" style="flex:1; min-width:120px;" onclick="undoTarotPick()">↩ 한 장 취소</button>` : ''}
+    </div>
+  `;
+}
+
+function pickTarot(n) {
+  const card = TAROT.find(c => c.n === n);
+  if (!card) return;
+  if (!currentTarot) currentTarot = [];
+  if (currentTarot.some(c => c.n === n)) return;
+  if (currentTarot.length >= 3) return;
+  currentTarot.push(card);
+  if (currentTarot.length >= 3) renderSelectedTarot();
+  else openTarotSelect();
+}
+
+function undoTarotPick() {
+  if (currentTarot && currentTarot.length) {
+    currentTarot.pop();
+    openTarotSelect();
+  }
+}
+
+function autoDrawTarot() {
+  currentTarot = drawTarot(3);
+  renderSelectedTarot();
+}
+
+function renderSelectedTarot() {
+  const positions = ['현재의 에너지', '주의할 점', '앞으로의 흐름'];
+  const cards = currentTarot || [];
+  document.getElementById('tarotBox').innerHTML = cards.map((c,i) => `
+  <div class="career-box" style="border-left:3px solid #7E57C2;">
+    <h4>🃏 ${positions[i]} — ${c.name} (${c.en})</h4>
+    <p style="margin:0.3rem 0;">${c.mean}</p>
+    <p style="color:#5C6BC0;font-weight:500;">💡 ${c.tip}</p>
+  </div>
+`).join('') + `
+  <p class="note">타로는 미래를 단정하지 않습니다. 지금 마음과 상황을 비추는 거울로 활용하세요.</p>
+  <div style="display:flex; gap:0.5rem; margin-top:0.5rem; flex-wrap:wrap;">
+    <button class="btn btn-option" style="flex:1; min-width:120px;" onclick="currentTarot=[]; openTarotSelect();">🃏 다시 고르기</button>
+    <button class="btn btn-option" style="flex:1; min-width:120px;" onclick="autoDrawTarot()">🎲 랜덤 다시</button>
+  </div>`;
+}
+
 function showResult(){
 const birthDate=document.getElementById('birthDate').value||'2005-05-20';
 const timeVal=document.getElementById('birthTime').value;
@@ -62,31 +134,10 @@ document.getElementById('rDailyAvoid').textContent=profile.daily.avoid;
 const sc=profile.studentCareer||{subjects:[],majors:[],jobs:[]};
 document.getElementById('careerContent').innerHTML=`<div class="career-box"><h4>📚 잘 맞는 과목 방향</h4><p>${sc.subjects.join(' · ')}</p></div><div class="career-box"><h4>🎓 추천 전공 계열</h4><p>${sc.majors.join(' · ')}</p></div><div class="career-box"><h4>💼 진로·직업 힌트</h4><p>${sc.jobs.join(' · ')}</p></div><p class="note">사주 일간·오행과 MBTI를 조합한 참고 자료입니다. 흥미와 현실을 함께 고려하세요.</p>`;
 
-currentTarot=drawTarot(3);
-const positions=['현재의 에너지','주의할 점','앞으로의 흐름'];
-document.getElementById('tarotBox').innerHTML=currentTarot.map((c,i)=>`
-  <div class="career-box" style="border-left:3px solid #7E57C2;">
-    <h4>🃏 ${positions[i]} — ${c.name} (${c.en})</h4>
-    <p style="margin:0.3rem 0;">${c.mean}</p>
-    <p style="color:#5C6BC0;font-weight:500;">💡 ${c.tip}</p>
-  </div>
-`).join('')+`<p class="note">타로는 미래를 단정하지 않습니다. 지금 마음과 상황을 비추는 거울로 활용하세요. 카드를 다시 뽑으려면 아래 버튼을 누르세요.</p>
-<button class="btn btn-option" style="margin-top:0.5rem;" onclick="redrawTarot()">🔄 타로 다시 뽑기</button>`;
+currentTarot = [];
+openTarotSelect();
 
 go('result');
-}
-
-function redrawTarot(){
-  currentTarot=drawTarot(3);
-  const positions=['현재의 에너지','주의할 점','앞으로의 흐름'];
-  document.getElementById('tarotBox').innerHTML=currentTarot.map((c,i)=>`
-  <div class="career-box" style="border-left:3px solid #7E57C2;">
-    <h4>🃏 ${positions[i]} — ${c.name} (${c.en})</h4>
-    <p style="margin:0.3rem 0;">${c.mean}</p>
-    <p style="color:#5C6BC0;font-weight:500;">💡 ${c.tip}</p>
-  </div>
-`).join('')+`<p class="note">타로는 미래를 단정하지 않습니다. 지금 마음과 상황을 비추는 거울로 활용하세요.</p>
-<button class="btn btn-option" style="margin-top:0.5rem;" onclick="redrawTarot()">🔄 타로 다시 뽑기</button>`;
 }
 
 function advice(cat){const box=document.getElementById('adviceBox');box.classList.remove('hidden');const key=cat==='student'?'student':cat;box.innerHTML=`<p style="line-height:1.8;">${currentProfile.advice[key]||currentProfile.advice.career}</p>`;box.scrollIntoView({behavior:'smooth'});}
