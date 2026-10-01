@@ -10,9 +10,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="기운과마음">
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+  <link rel="apple-touch-icon" href="icon-192.svg">
+  <link rel="icon" type="image/svg+xml" href="icon-192.svg">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -71,6 +70,46 @@
     .note {font-size:0.8rem; color:var(--muted); margin-top:0.5rem; line-height:1.5;}
     .career-box {background:#f9f8f6; border-radius:12px; padding:1rem; margin:0.6rem 0;}
     .career-box h4 {margin-bottom:0.4rem; font-size:0.95rem;}
+    .tarot-grid {display:grid; grid-template-columns:repeat(4,1fr); gap:0.45rem;}
+    @media (min-width:400px){.tarot-grid{grid-template-columns:repeat(5,1fr);}}
+    .tarot-card-btn {
+      aspect-ratio: 3/4;
+      border: 2px solid #e0dce8;
+      border-radius: 10px;
+      background: linear-gradient(160deg, #f8f6fc, #efeaf8);
+      cursor: pointer;
+      padding: 0.35rem 0.2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.15rem;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .tarot-card-btn:hover:not(:disabled) {
+      border-color: #7E57C2;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(126,87,194,0.2);
+    }
+    .tarot-card-btn:active:not(:disabled) { transform: scale(0.96); }
+    .tarot-card-btn.used {
+      opacity: 0.35;
+      cursor: not-allowed;
+      filter: grayscale(0.6);
+    }
+    .tarot-card-btn .tc-num {
+      font-size: 0.7rem;
+      color: #7E57C2;
+      font-weight: 700;
+    }
+    .tarot-card-btn .tc-name {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #333;
+      text-align: center;
+      line-height: 1.2;
+    }
     .install-banner {display:none; position:fixed; bottom:0; left:0; right:0; background:#5C6BC0; color:white; padding:1rem 1.2rem; padding-bottom:calc(1rem + env(safe-area-inset-bottom)); z-index:100; box-shadow:0 -4px 20px rgba(0,0,0,0.15);}
     .install-banner.show {display:flex; align-items:center; justify-content:space-between; gap:1rem; max-width:520px; margin:0 auto;}
     .install-banner p {font-size:0.9rem; flex:1;}
@@ -184,7 +223,6 @@
 <script src="app-b.js"></script>
 <script src="app-c.js"></script>
 <script>
-// PWA install + service worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
